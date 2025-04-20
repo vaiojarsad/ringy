@@ -6,6 +6,7 @@ import (
 
 	"github.com/vaiojarsad/ringy/internal/appcontext"
 	"github.com/vaiojarsad/ringy/internal/executor"
+	netutil "github.com/vaiojarsad/ringy/internal/util/net"
 )
 
 type exec struct {
@@ -21,7 +22,11 @@ func NewUDPBroadcastExecutor() (executor.Executor, error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := net.ListenMulticastUDP("udp", nil, addr)
+	iFace, err := netutil.GetDefaultInterface()
+	if err != nil {
+		return nil, err
+	}
+	conn, err := net.ListenMulticastUDP("udp", iFace, addr)
 	if err != nil {
 		return nil, err
 	}

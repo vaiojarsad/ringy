@@ -25,6 +25,7 @@ func main() {
 	// Set up a logger for output
 	c.ErrLogger = log.New(os.Stderr, lc.Prefix, lc.Flag)
 	c.OutLogger = log.New(os.Stdout, lc.Prefix, lc.Flag)
+	c.CfgManager = cfgManager
 
 	// Set up a channel to handle OS signals
 	signals := make(chan os.Signal, 1)

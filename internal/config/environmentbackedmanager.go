@@ -40,7 +40,7 @@ func newEnvironmentBackedManager() (Manager, error) {
 }
 
 func getLoggerConfig() (*LoggerConfig, error) {
-	var flag = log.LstdFlags
+	var flag = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Llongfile
 	flagStr := os.Getenv("LOGGER_FLAG")
 	flagStr = strings.TrimSpace(flagStr)
 	if flagStr != "" {
