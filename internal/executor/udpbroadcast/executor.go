@@ -5,13 +5,14 @@ import (
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
-	ioutil "github.com/vaiojarsad/ringy/internal/util/io"
 	"net"
 	"os"
+	"path"
 	"time"
 
 	"github.com/vaiojarsad/ringy/internal/appcontext"
 	"github.com/vaiojarsad/ringy/internal/executor"
+	ioutil "github.com/vaiojarsad/ringy/internal/util/io"
 	netutil "github.com/vaiojarsad/ringy/internal/util/net"
 )
 
@@ -64,7 +65,8 @@ func (e *exec) Do() error {
 }
 
 func (e *exec) playMP3() {
-	f, err := os.Open("C:\\Pablo\\Aguanta.mp3")
+	apc := e.c.CfgManager.GetAudioPlaybackConfig()
+	f, err := os.Open(path.Clean(path.Join(apc.AudioFilesPath, apc.RingAudio)))
 	if err != nil {
 		e.c.ErrLogger.Printf("Error opening MP3 file: %v\n", err)
 		return

@@ -9,8 +9,9 @@ import (
 )
 
 type environmentBackedManager struct {
-	loggerConfig  *LoggerConfig
-	networkConfig *NetworkConfig
+	loggerConfig        *LoggerConfig
+	networkConfig       *NetworkConfig
+	audioPlaybackConfig *AudioPlaybackConfig
 }
 
 func (m *environmentBackedManager) GetLoggerConfig() *LoggerConfig {
@@ -19,6 +20,10 @@ func (m *environmentBackedManager) GetLoggerConfig() *LoggerConfig {
 
 func (m *environmentBackedManager) GetNetworkConfig() *NetworkConfig {
 	return m.networkConfig
+}
+
+func (m *environmentBackedManager) GetAudioPlaybackConfig() *AudioPlaybackConfig {
+	return m.audioPlaybackConfig
 }
 
 func newEnvironmentBackedManager() (Manager, error) {
@@ -32,9 +37,15 @@ func newEnvironmentBackedManager() (Manager, error) {
 		return nil, err
 	}
 
+	audioPlaybackConfig, err := getAudioPlaybackConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	m := &environmentBackedManager{
-		loggerConfig:  loggerConfig,
-		networkConfig: networkConfig,
+		loggerConfig:        loggerConfig,
+		networkConfig:       networkConfig,
+		audioPlaybackConfig: audioPlaybackConfig,
 	}
 	return m, nil
 }
@@ -72,5 +83,18 @@ func getNetworkConfig() (*NetworkConfig, error) {
 	return &NetworkConfig{
 		MulticastAddr: ma,
 		Port:          p,
+	}, nil
+}
+
+func getAudioPlaybackConfig() (*AudioPlaybackConfig, error) {
+	audioFilesPath := os.Getenv("AUDIO_FILES_PATH")
+	audioFilesPath = strings.TrimLeftFunc(audioFilesPath, unicode.IsSpace)
+
+	ringAudio := os.Getenv("RING_AUDIO")
+	ringAudio = strings.TrimLeftFunc(ringAudio, unicode.IsSpace)
+
+	return &AudioPlaybackConfig{
+		AudioFilesPath: audioFilesPath,
+		RingAudio:      ringAudio,
 	}, nil
 }

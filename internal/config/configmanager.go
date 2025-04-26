@@ -13,11 +13,17 @@ var (
 type Manager interface {
 	GetLoggerConfig() *LoggerConfig
 	GetNetworkConfig() *NetworkConfig
+	GetAudioPlaybackConfig() *AudioPlaybackConfig
 }
 
 type LoggerConfig struct {
 	Prefix string
 	Flag   int
+}
+
+type AudioPlaybackConfig struct {
+	AudioFilesPath string
+	RingAudio      string
 }
 
 type NetworkConfig struct {
