@@ -1,6 +1,7 @@
 BIN_BASE_NAME=ringy
 DAEMON_NAME=ringy
 DAEMON_USER=ringy
+DAEMON_GROUP=ringy
 DAEMON_DESC=Ringy service
 INSTALL_DIR=/opt
 
@@ -16,7 +17,7 @@ build:
 clean:
 	rm -f $(BIN_NAME)
 
-install: build create-user add-to-audio
+install: build create-group create-user add-to-group add-to-audio
 	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null <<EOF
@@ -37,6 +38,14 @@ install: build create-user add-to-audio
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(DAEMON_NAME)
 
+create-group:
+	@if ! getent group my-daemon > /dev/null 2>&1; then \
+		  sudo groupadd $(DAEMON_GROUP); \
+		  echo "Group '$(DAEMON_GROUP)' created."; \
+	else \
+		echo "Group '$(DAEMON_GROUP)' already exists."; \
+	fi
+
 create-user:
 	@if id "$(DAEMON_USER)" >/dev/null 2>&1; then \
 		echo "User '$(DAEMON_USER)' already exists"; \
@@ -50,5 +59,13 @@ add-to-audio:
 		echo "$(DAEMON_USER) is already in the audio group"; \
 	else \
 		echo "Adding $(DAEMON_USER) to audio group..."; \
+		sudo usermod -aG audio $(DAEMON_USER); \
+	fi
+
+add-to-group:
+	@if id -nG "$(DAEMON_USER)" | tr ' ' '\n' | grep -Fxq "$(DAEMON_GROUP)"; then \
+		echo "$(DAEMON_USER) is already in the $(DAEMON_GROUP) group"; \
+	else \
+		echo "Adding $(DAEMON_USER) to $(DAEMON_GROUP) group..."; \
 		sudo usermod -aG audio $(DAEMON_USER); \
 	fi
