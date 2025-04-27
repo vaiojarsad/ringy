@@ -51,7 +51,7 @@ create-user:
 		echo "User '$(DAEMON_USER)' already exists"; \
 	else \
 		echo "Creating system user '$(DAEMON_USER)'..."; \
-		sudo useradd --system --no-create-home --shell /usr/sbin/nologin $(DAEMON_USER); \
+		sudo useradd --system --no-create-home --shell /usr/sbin/nologin -g $(DAEMON_GROUP) $(DAEMON_USER); \
 	fi
 
 add-to-audio:
