@@ -37,7 +37,7 @@ endef
 install: build create-group create-user add-to-group add-to-audio
 	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)
-	@printf "%s\n" "$$SERVICE_FILE" | sudo tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null
+	echo "$(SERVICE_FILE)" | sudo tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(DAEMON_NAME)
 
