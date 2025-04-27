@@ -20,26 +20,26 @@ clean:
 install: build create-group create-user add-to-group add-to-audio
 	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)
-	sudo tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null <<EOF
-	[Unit]
-	Description=$(DAEMON_DESC)
-	After=network.target
+	sudo sh -c 'tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null <<EOF
+[Unit]
+Description=$(DAEMON_DESC)
+After=network.target
 
-	[Service]
-	ExecStart=$(INSTALL_DIR)/$(BIN_NAME)
-	Restart=on-failure
-	User=$(DAEMON_USER)
-	StandardOutput=journal
-	StandardError=journal
+[Service]
+ExecStart=$(INSTALL_DIR)/$(BIN_NAME)
+Restart=on-failure
+User=$(DAEMON_USER)
+StandardOutput=journal
+StandardError=journal
 
-	[Install]
-	WantedBy=multi-user.target
-	EOF
+[Install]
+WantedBy=multi-user.target
+EOF'
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(DAEMON_NAME)
 
 create-group:
-	@if ! getent group my-daemon > /dev/null 2>&1; then \
+	@if ! getent group $(DAEMON_GROUP) > /dev/null 2>&1; then \
 		  sudo groupadd $(DAEMON_GROUP); \
 		  echo "Group '$(DAEMON_GROUP)' created."; \
 	else \
@@ -67,5 +67,5 @@ add-to-group:
 		echo "$(DAEMON_USER) is already in the $(DAEMON_GROUP) group"; \
 	else \
 		echo "Adding $(DAEMON_USER) to $(DAEMON_GROUP) group..."; \
-		sudo usermod -aG audio $(DAEMON_USER); \
+		sudo usermod -aG $(DAEMON_GROUP) $(DAEMON_USER); \
 	fi
