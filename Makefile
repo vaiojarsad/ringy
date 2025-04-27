@@ -17,25 +17,27 @@ build:
 clean:
 	rm -f $(BIN_NAME)
 
+define SERVICE_FILE
+[Unit]
+Description=$(DAEMON_DESC)
+After=network.target
+
+[Service]
+ExecStart=$(INSTALL_DIR)/$(BIN_NAME)
+Restart=on-failure
+User=$(DAEMON_USER)
+Group=$(DAEMON_GROUP)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+endef
+
 install: build create-group create-user add-to-group add-to-audio
 	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)
-	sudo sh -c 'tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null <<EOF \
-[Unit] \
-Description=$(DAEMON_DESC) \
-After=network.target \
- \
-[Service] \
-ExecStart=$(INSTALL_DIR)/$(BIN_NAME) \
-Restart=on-failure \
-User=$(DAEMON_USER) \
-Group=$(DAEMON_GROUP) \
-StandardOutput=journal \
-StandardError=journal \
- \
-[Install] \
-WantedBy=multi-user.target \
-EOF'
+	@printf "%s\n" "$$SERVICE_FILE" | sudo tee /etc/systemd/system/$(DAEMON_NAME).service > /dev/null
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(DAEMON_NAME)
 
