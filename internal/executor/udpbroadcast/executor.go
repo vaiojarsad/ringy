@@ -3,6 +3,7 @@ package udpbroadcast
 import (
 	"fmt"
 	"github.com/faiface/beep"
+	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 	"net"
@@ -80,6 +81,13 @@ func (e *exec) playMP3() {
 	}
 	defer ioutil.Close(streamer, "playMP3")
 
+	volume := &effects.Volume{
+		Streamer: streamer,
+		Base:     2,      // log base (por defecto es 2)
+		Volume:   2,      // 0 = volumen original, >0 = más fuerte, <0 = más bajo
+		Silent:   false,  // si lo ponés en true, silencia completamente
+	}
+
 	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	if err != nil {
 		e.c.ErrLogger.Printf("Error initializing speaker: %v\n", err)
@@ -87,7 +95,7 @@ func (e *exec) playMP3() {
 	}
 
 	done := make(chan struct{})
-	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+	speaker.Play(beep.Seq(volume, beep.Callback(func() {
 		close(done)
 	})))
 
