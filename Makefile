@@ -25,6 +25,10 @@ build:
 clean:
 	rm -f $(BIN_NAME)
 
+update: 
+	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
+	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)
+
 install: build create-group create-user add-to-group add-to-audio
 	sudo cp $(BIN_NAME) $(INSTALL_DIR)/$(BIN_NAME)
 	sudo chown $(DAEMON_USER):$(DAEMON_USER) $(INSTALL_DIR)/$(BIN_NAME)

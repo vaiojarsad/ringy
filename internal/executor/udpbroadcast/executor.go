@@ -61,13 +61,13 @@ func (e *exec) Do() error {
 		return err
 	}
 	e.c.OutLogger.Printf("Received %d bytes from %s: %s\n", n, src, string(buf[:n]))
-	e.playMP3()
+	e.playMP3(string(buf[:n]))
 	return nil
 }
 
-func (e *exec) playMP3() {
+func (e *exec) playMP3(mp3name string) {
 	apc := e.c.CfgManager.GetAudioPlaybackConfig()
-	f, err := os.Open(path.Clean(path.Join(apc.AudioFilesPath, apc.RingAudio)))
+	f, err := os.Open(path.Clean(path.Join(apc.AudioFilesPath, mp3name)) + ".mp3")
 	if err != nil {
 		e.c.ErrLogger.Printf("Error opening MP3 file: %v\n", err)
 		return
